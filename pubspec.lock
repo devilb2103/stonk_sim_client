@@ -9,6 +9,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.10.0"
+  bloc:
+    dependency: "direct main"
+    description:
+      name: bloc
+      sha256: "658a5ae59edcf1e58aac98b000a71c762ad8f46f1394c34a52050cafb3e11a80"
+      url: "https://pub.dev"
+    source: hosted
+    version: "8.1.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -49,6 +57,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  dio:
+    dependency: "direct main"
+    description:
+      name: dio
+      sha256: f7c26ddb3a10ff033cf1bfbf2c668feb3472327f48385775f7cf25b104f8bfce
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.1.0"
   fake_async:
     dependency: transitive
     description:
@@ -62,6 +78,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_bloc:
+    dependency: "direct main"
+    description:
+      name: flutter_bloc
+      sha256: "434951eea948dbe87f737b674281465f610b8259c16c097b8163ce138749a775"
+      url: "https://pub.dev"
+    source: hosted
+    version: "8.1.2"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -75,6 +99,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  http_parser:
+    dependency: transitive
+    description:
+      name: http_parser
+      sha256: "2aa08ce0341cc9b354a498388e30986515406668dbcc4f7c950c3e715496693b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.2"
   js:
     dependency: transitive
     description:
@@ -91,6 +123,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  logging:
+    dependency: transitive
+    description:
+      name: logging
+      sha256: "04094f2eb032cbb06c6f6e8d3607edcfcb0455e2bb6cbc010cb01171dcb64e6d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.1"
   matcher:
     dependency: transitive
     description:
@@ -115,6 +155,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.0"
+  nested:
+    dependency: transitive
+    description:
+      name: nested
+      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   path:
     dependency: transitive
     description:
@@ -123,11 +171,35 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.2"
+  provider:
+    dependency: transitive
+    description:
+      name: provider
+      sha256: cdbe7530b12ecd9eb455bdaa2fcb8d4dad22e80b8afb4798b41479d5ce26847f
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.5"
   sky_engine:
     dependency: transitive
     description: flutter
     source: sdk
     version: "0.0.99"
+  socket_io_client:
+    dependency: "direct main"
+    description:
+      name: socket_io_client
+      sha256: a9c589d3fe2658506be38ddb36f23348daab73a00ff1645533669d07a5111cfc
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
+  socket_io_common:
+    dependency: transitive
+    description:
+      name: socket_io_common
+      sha256: "5a218a784df4d1927ae713e17af619caa736cb2ebac287c59e4e24228b22da29"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
   source_span:
     dependency: transitive
     description:
@@ -176,6 +248,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.16"
+  typed_data:
+    dependency: transitive
+    description:
+      name: typed_data
+      sha256: "26f87ade979c47a150c9eaab93ccd2bebe70a27dc0b4b29517f2904f04eb11a5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.1"
   vector_math:
     dependency: transitive
     description:
@@ -186,3 +266,4 @@ packages:
     version: "2.1.4"
 sdks:
   dart: ">=2.19.0-429.0.dev <4.0.0"
+  flutter: ">=1.16.0"

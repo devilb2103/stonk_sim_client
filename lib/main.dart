@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:stonk_sim_client/Cubits/SuggestionRefresh/suggestion_refresh_cubit.dart';
 import 'package:stonk_sim_client/app_navigator.dart';
 
 void main() {
@@ -11,26 +13,16 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'StonkSim',
-      debugShowCheckedModeBanner: false,
-      home: Main(),
-    );
-  }
-}
-
-class Main extends StatefulWidget {
-  const Main({super.key});
-
-  @override
-  State<Main> createState() => _MainState();
-}
-
-class _MainState extends State<Main> {
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: AppNavigator(),
-    );
+    return MaterialApp(
+        title: 'StonkSim',
+        debugShowCheckedModeBanner: false,
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => SuggestionRefreshCubit(),
+            ),
+          ],
+          child: const AppNavigator(),
+        ));
   }
 }

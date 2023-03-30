@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:stonk_sim_client/Cubits/SuggestionRefresh/suggestion_refresh_cubit.dart';
+import 'package:stonk_sim_client/Screens/search_screen.dart';
 import 'package:stonk_sim_client/colors.dart';
 import 'package:stonk_sim_client/network_vars.dart';
 import 'package:dio/dio.dart';
@@ -94,8 +95,10 @@ class AllShareListViewState extends State<AllShareListView> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle style1 =
-        TextStyle(color: textColorLightGrey, fontWeight: FontWeight.w500);
+    TextStyle style1 = TextStyle(
+        color: textColorLightGrey,
+        fontWeight: FontWeight.w500,
+        overflow: TextOverflow.ellipsis);
 
     return Expanded(
       child: SizedBox(
@@ -135,48 +138,55 @@ class AllShareListViewState extends State<AllShareListView> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Container(
-                                    child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      sampleStocks[index]['name'].toString(),
-                                      style: style1,
-                                    ),
-                                    Text(
-                                        sampleStocks[index]['ticker']
-                                            .toString(),
-                                        style: TextStyle(
-                                            color: textColorDarkGrey,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 12))
-                                  ],
-                                )),
-                                Container(
-                                    child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                        "\$" +
-                                            sampleStocks[index]['price']
-                                                .toString(),
-                                        style: style1),
-                                    Text(
-                                        sampleStocks[index]['change']
-                                                .toString() +
-                                            "%",
-                                        style: TextStyle(
-                                            color: sampleStocks[index]
-                                                        ['change'] <=
-                                                    0
-                                                ? lossColor
-                                                : profitColor,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 12))
-                                  ],
-                                )),
+                                Expanded(
+                                  flex: 7,
+                                  child: Container(
+                                      child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        sampleStocks[index]['name'].toString(),
+                                        style: style1,
+                                      ),
+                                      Text(
+                                          sampleStocks[index]['ticker']
+                                              .toString(),
+                                          style: TextStyle(
+                                              color: textColorDarkGrey,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12))
+                                    ],
+                                  )),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: Container(
+                                      child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                          "\$" +
+                                              sampleStocks[index]['price']
+                                                  .toString(),
+                                          style: style1),
+                                      Text(
+                                          sampleStocks[index]['change']
+                                                  .toString() +
+                                              "%",
+                                          style: TextStyle(
+                                              color: sampleStocks[index]
+                                                          ['change'] <=
+                                                      0
+                                                  ? lossColor
+                                                  : profitColor,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12))
+                                    ],
+                                  )),
+                                ),
                               ],
                             ),
                           )),
@@ -284,7 +294,13 @@ class SearchBar extends StatelessWidget {
           ),
           child: InkWell(
               borderRadius: BorderRadius.circular(80),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SearchScreen(),
+                    ));
+              },
               child: Padding(
                 padding: const EdgeInsets.only(left: 18),
                 child: Row(

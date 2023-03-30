@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:stonk_sim_client/Cubits/SuggestionRefresh/suggestion_refresh_cubit.dart';
+import 'package:stonk_sim_client/colors.dart';
 import 'package:stonk_sim_client/network_vars.dart';
 import 'package:dio/dio.dart';
 
@@ -15,98 +14,299 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final IO.Socket socket = IO.io(
-      address,
-      IO.OptionBuilder()
-          .setTransports(['websocket'])
-          .disableAutoConnect()
-          .build());
-  final dio = Dio();
-  String? _selectedItem;
   @override
   void initState() {
     super.initState();
     // connect();
   }
 
-  void connect() {
-    socket.connect();
-    socket.onConnect((data) {
-      debugPrint("connected");
-      addTicker("msft");
-      addTicker("adanient.ns");
-      socket.on("tickerStream",
-          (data) => {tickerData = data, debugPrint(tickerData.toString())});
-    });
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+          body: Container(
+        color: backgroundColor,
+        width: double.maxFinite,
+        height: double.maxFinite,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 21, vertical: 15),
+          child: Column(children: const [
+            SearchBar(),
+            SizedBox(height: 15),
+            AccountDetails(),
+            SizedBox(height: 15),
+            AllShareListView()
+          ]),
+        ),
+      )),
+    );
   }
+}
 
-  void addTicker(String ticker) {
-    socket.emit("addTicker", {
-      "tickers": [ticker.toString()]
-    });
-  }
+class AllShareListView extends StatefulWidget {
+  const AllShareListView({super.key});
 
-  Future<List<dynamic>> getTickerRecommendations(String ticker) async {
-    // https://ticker-2e1ica8b9.now.sh//keyword/[KEYWORD_SEARCH]
-    String queryData = ticker;
-    if (queryData.isNotEmpty) {
-      final data = await dio.get(reccAddress + ticker);
-      return data.data;
-    } else {
-      return [];
+  @override
+  State<AllShareListView> createState() => AllShareListViewState();
+}
+
+class AllShareListViewState extends State<AllShareListView> {
+  final List<Map<String, dynamic>> sampleStocks = [
+    {
+      "ticker": "AAP",
+      "name": "Advance Auto Parts Inc W/I",
+      "price": 442.82,
+      "change": -4.36
+    },
+    {"ticker": "AAPL", "name": "Apple Inc.", "price": 442.82, "change": 4.36},
+    {
+      "ticker": "CAAP",
+      "name": "Corporacion America Airports SA",
+      "price": 442.82,
+      "change": 4.36
+    },
+    {
+      "ticker": "AAP",
+      "name": "Advance Auto Parts Inc W/I",
+      "price": 442.82,
+      "change": -4.36
+    },
+    {"ticker": "AAPL", "name": "Apple Inc.", "price": 442.82, "change": 4.36},
+    {
+      "ticker": "CAAP",
+      "name": "Corporacion America Airports SA",
+      "price": 442.82,
+      "change": 4.36
+    },
+    {
+      "ticker": "AMSF",
+      "name": "AMERISAFE Inc.",
+      "price": 442.82,
+      "change": 4.36
+    },
+    {
+      "ticker": "MSFT",
+      "name": "Microsoft Corporation",
+      "price": 442.82,
+      "change": 4.36
     }
-  }
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SizedBox(
-      width: double.maxFinite,
-      child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        SizedBox(
-          width: 300,
-          child: TextFormField(
-            onChanged: (value) async {
-              suggestions = await getTickerRecommendations(value.toString());
-              print(suggestions.toString());
-              // debugPrint(suggestions.toString());
-              context.read<SuggestionRefreshCubit>().refreshSuggestionUI();
-            },
-            decoration: InputDecoration(
-                enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black26),
-                    borderRadius: BorderRadius.circular(15)),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black54),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                border: const OutlineInputBorder(),
-                hintText: "ticker",
-                filled: true,
-                fillColor: Colors.white),
-          ),
-        ),
-        Expanded(
-            child: BlocConsumer<SuggestionRefreshCubit, SuggestionRefreshState>(
-          listener: (context, state) {
-            if (state is SuggestionRefreshInitialState) {}
-          },
-          builder: (context, state) {
-            if (state is SuggestionRefreshInitialState) {
-              return ListView.builder(
-                itemCount: suggestions.length,
+    TextStyle style1 =
+        TextStyle(color: textColorLightGrey, fontWeight: FontWeight.w500);
+
+    return Expanded(
+      child: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "My shares",
+              style: TextStyle(
+                  color: textColorLightGrey,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500),
+            ),
+            SizedBox(height: 15),
+            Expanded(
+              child: ListView.builder(
+                physics: BouncingScrollPhysics(),
+                itemCount: sampleStocks.length,
                 itemBuilder: (context, index) {
-                  if (suggestions.isNotEmpty) {
-                    return Text(suggestions[index].toString());
-                  }
+                  return SizedBox(
+                    height: 84,
+                    child: Card(
+                      elevation: 1,
+                      color: searchBarColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: InkWell(
+                          borderRadius: BorderRadius.circular(18),
+                          highlightColor: searchBarColor,
+                          onTap: () {},
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                    child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      sampleStocks[index]['name'].toString(),
+                                      style: style1,
+                                    ),
+                                    Text(
+                                        sampleStocks[index]['ticker']
+                                            .toString(),
+                                        style: TextStyle(
+                                            color: textColorDarkGrey,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 12))
+                                  ],
+                                )),
+                                Container(
+                                    child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                        "\$" +
+                                            sampleStocks[index]['price']
+                                                .toString(),
+                                        style: style1),
+                                    Text(
+                                        sampleStocks[index]['change']
+                                                .toString() +
+                                            "%",
+                                        style: TextStyle(
+                                            color: sampleStocks[index]
+                                                        ['change'] <=
+                                                    0
+                                                ? lossColor
+                                                : profitColor,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 12))
+                                  ],
+                                )),
+                              ],
+                            ),
+                          )),
+                    ),
+                  );
                 },
-              );
-            } else {
-              return const Center(child: CircularProgressIndicator());
-            }
-          },
-        ))
-      ]),
-    ));
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AccountDetails extends StatefulWidget {
+  const AccountDetails({super.key});
+
+  @override
+  State<AccountDetails> createState() => _AccountDetailsState();
+}
+
+class _AccountDetailsState extends State<AccountDetails> {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        // height: 180,
+        width: double.maxFinite,
+        child: Card(
+          elevation: 1,
+          color: backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(18),
+            highlightColor: searchBarColor,
+            onTap: () {},
+            child: Column(
+              children: [
+                SizedBox(height: 12),
+                Text(
+                  '\$12,345.03',
+                  style: TextStyle(
+                      color: textColorLightGrey,
+                      fontSize: 45,
+                      fontWeight: FontWeight.w500),
+                ),
+                SizedBox(
+                  height: 30,
+                  child: Card(
+                    color: profitColor,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 9),
+                      child: IntrinsicHeight(
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Text(
+                                "+5.25%",
+                                style: TextStyle(fontWeight: FontWeight.w500),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 4.5),
+                                child: VerticalDivider(width: 12),
+                              ),
+                              Text(
+                                "+\$642.26",
+                                style: TextStyle(fontWeight: FontWeight.w500),
+                              )
+                            ]),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 18),
+              ],
+            ),
+          ),
+        ));
+  }
+}
+
+class SearchBar extends StatelessWidget {
+  const SearchBar({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        height: 54,
+        width: double.maxFinite,
+        child: Card(
+          elevation: 1,
+          color: searchBarColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(80),
+          ),
+          child: InkWell(
+              borderRadius: BorderRadius.circular(80),
+              onTap: () {},
+              child: Padding(
+                padding: const EdgeInsets.only(left: 18),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.search_rounded, color: textColorDarkGrey),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          "Search for companies or symbols",
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              color: textColorDarkGrey,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              )),
+        ));
   }
 }

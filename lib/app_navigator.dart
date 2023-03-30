@@ -14,6 +14,7 @@ class _AppNavigatorState extends State<AppNavigator> {
     return Navigator(
       pages: const [
         MaterialPage(child: DashboardScreen()),
+        // MaterialPage(child: DashboardScreen()),
       ],
       onPopPage: (route, result) {
         return route.didPop(result);

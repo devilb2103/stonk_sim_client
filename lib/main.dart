@@ -17,12 +17,15 @@ class MyApp extends StatelessWidget {
         title: 'StonkSim',
         debugShowCheckedModeBanner: false,
         home: MultiBlocProvider(
-          providers: [
-            BlocProvider(
-              create: (context) => SuggestionRefreshCubit(),
-            ),
-          ],
-          child: const AppNavigator(),
-        ));
+            providers: [
+              BlocProvider(
+                create: (context) => SuggestionRefreshCubit(),
+              ),
+            ],
+            child: const Center(
+              // child:
+              // AspectRatio(aspectRatio: 1080 / 2340, child: AppNavigator())),
+              child: AppNavigator(),
+            )));
   }
 }

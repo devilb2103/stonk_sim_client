@@ -11,8 +11,8 @@ class SuggestionRefreshCubit extends Cubit<SuggestionRefreshState> {
   final dio = Dio();
 
   Future<void> refreshSuggestionUI(String ticker) async {
-    emit(const SuggestionRefreshingState());
     String queryData = ticker;
+    emit(const SuggestionRefreshingState());
     try {
       if (queryData.isNotEmpty) {
         final data = await dio.get(reccAddress + ticker);
@@ -21,7 +21,7 @@ class SuggestionRefreshCubit extends Cubit<SuggestionRefreshState> {
         suggestions = [];
       }
     } catch (e) {}
-
+    emit(const SuggestionRefreshingState());
     emit(const SuggestionRefreshInitialState());
   }
 }

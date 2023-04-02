@@ -1,5 +1,5 @@
-String address = "http://localhost:8080";
-// String address = "https://stonksim.onrender.com";
+// String address = "http://localhost:8080";
+String address = "https://stonksim.onrender.com";
 Map<String, dynamic> wishList = {};
 Map<String, String> tickerNames = {};
 // Map<String, dynamic> ownedStocks = {};

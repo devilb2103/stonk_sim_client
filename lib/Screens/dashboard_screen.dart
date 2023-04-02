@@ -214,7 +214,8 @@ class wishListItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          wishList.keys.toList()[index].toString(),
+                          tickerNames[wishList.keys.toList()[index].toString()]
+                              .toString(),
                           style: style1,
                         ),
                         Text(wishList.keys.toList()[index].toString(),
@@ -232,15 +233,21 @@ class wishListItem extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                            "\$" +
-                                wishList.values.toList()[index][0].toString(),
+                        Text("\$${wishList.values.toList()[index][0]}",
                             style: style1),
                         Text(wishList.values.toList()[index][2] + "%",
                             style: TextStyle(
-                                // color: wishList.values.toList()[index][2] <= 0
-                                //     ? lossColor
-                                //     : profitColor,
+                                color: (wishList.values
+                                            .toList()[index][2]
+                                            .toString() !=
+                                        "NA")
+                                    ? (double.parse(wishList.values
+                                                .toList()[index][2]
+                                                .toString()) <=
+                                            0
+                                        ? lossColor
+                                        : profitColor)
+                                    : textColorDarkGrey,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12))
                       ],

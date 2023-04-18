@@ -107,6 +107,9 @@ class searchResultElement extends StatelessWidget {
           context.read<WishlistCubit>().addTicker(suggestions[index]['symbol']);
           tickerNames[suggestions[index]['symbol']] =
               suggestions[index]['name'];
+          try {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          } catch (e) {}
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               backgroundColor: searchBarColor,
               duration: Duration(seconds: 3),

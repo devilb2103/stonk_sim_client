@@ -29,8 +29,6 @@ class MyApp extends StatelessWidget {
               ),
             ],
             child: const Center(
-              // child:
-              // AspectRatio(aspectRatio: 1080 / 2340, child: AppNavigator())),
               child: AppNavigator(),
             )));
   }

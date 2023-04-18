@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:stonk_sim_client/Cubits/cubit/wishlist_cubit.dart';
+import 'package:stonk_sim_client/Models/stock_details_model.dart';
 import 'package:stonk_sim_client/Screens/search_screen.dart';
+import 'package:stonk_sim_client/Screens/stock_details_screen.dart';
+import 'package:stonk_sim_client/Utils/stockUtils.dart';
 import 'package:stonk_sim_client/colors.dart';
 import 'package:stonk_sim_client/network_vars.dart';
 import 'package:dio/dio.dart';
@@ -33,6 +36,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 debugPrint(wishList.toString())
               });
     });
+    socket.onDisconnect((data) => {debugPrint("disconnected"), disconnect()});
+  }
+
+  void disconnect() {
+    socket.disconnect();
+    Navigator.pop(context);
   }
 
   @override
@@ -68,47 +77,6 @@ class AllShareListView extends StatefulWidget {
 }
 
 class AllShareListViewState extends State<AllShareListView> {
-  final List<Map<String, dynamic>> sampleStocks = [
-    {
-      "ticker": "AAP",
-      "name": "Advance Auto Parts Inc W/I",
-      "price": 442.82,
-      "change": -4.36
-    },
-    {"ticker": "AAPL", "name": "Apple Inc.", "price": 442.82, "change": 4.36},
-    {
-      "ticker": "CAAP",
-      "name": "Corporacion America Airports SA",
-      "price": 442.82,
-      "change": 4.36
-    },
-    {
-      "ticker": "AAP",
-      "name": "Advance Auto Parts Inc W/I",
-      "price": 442.82,
-      "change": -4.36
-    },
-    {"ticker": "AAPL", "name": "Apple Inc.", "price": 442.82, "change": 4.36},
-    {
-      "ticker": "CAAP",
-      "name": "Corporacion America Airports SA",
-      "price": 442.82,
-      "change": 4.36
-    },
-    {
-      "ticker": "AMSF",
-      "name": "AMERISAFE Inc.",
-      "price": 442.82,
-      "change": 4.36
-    },
-    {
-      "ticker": "MSFT",
-      "name": "Microsoft Corporation",
-      "price": 442.82,
-      "change": 4.36
-    }
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -150,7 +118,8 @@ class UserWishListState extends State<UserWishList> {
           return (wishList.isEmpty)
               ? const emptyWishlistMessage()
               : ListView.builder(
-                  physics: const BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics()),
                   itemCount: wishList.keys.toList().length,
                   itemBuilder: (context, index) {
                     return wishListItem(index: index);
@@ -181,15 +150,29 @@ class emptyWishlistMessage extends StatelessWidget {
 
 class wishListItem extends StatelessWidget {
   wishListItem({super.key, required this.index});
+
   int index;
+
   TextStyle style1 = const TextStyle(
       color: textColorLightGrey,
       fontWeight: FontWeight.w500,
       overflow: TextOverflow.ellipsis);
+
+  void showStockDetailsPage(BuildContext context, StockDetails details) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => StockDetailsScreen(index: index),
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
+    //
+    StockDetails details = getStockDetails(index);
+    //
     return SizedBox(
-      height: 84,
+      height: 90,
       child: Card(
         elevation: 1,
         color: searchBarColor,
@@ -199,9 +182,22 @@ class wishListItem extends StatelessWidget {
         child: InkWell(
             borderRadius: BorderRadius.circular(18),
             highlightColor: searchBarColor,
-            onTap: () {},
+            onTap: () {
+              showStockDetailsPage(
+                  context,
+                  StockDetails(
+                      companyName: details.companyName,
+                      ticker: details.ticker,
+                      currentPrice: details.currentPrice,
+                      priceChange: details.priceChange,
+                      priceChangeP: details.priceChangeP,
+                      openingPrice: details.openingPrice,
+                      previousClosingPrice: details.previousClosingPrice,
+                      volume: details.volume,
+                      dailyRange: details.dailyRange));
+            },
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 21),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -214,11 +210,10 @@ class wishListItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          tickerNames[wishList.keys.toList()[index].toString()]
-                              .toString(),
+                          details.companyName,
                           style: style1,
                         ),
-                        Text(wishList.keys.toList()[index].toString(),
+                        Text(details.ticker,
                             style: TextStyle(
                                 color: textColorDarkGrey,
                                 fontWeight: FontWeight.w500,
@@ -233,9 +228,8 @@ class wishListItem extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text("\$${wishList.values.toList()[index][0]}",
-                            style: style1),
-                        Text(wishList.values.toList()[index][2] + "%",
+                        Text("\$${details.currentPrice}", style: style1),
+                        Text(details.priceChangeP,
                             style: TextStyle(
                                 color: (wishList.values
                                             .toList()[index][2]

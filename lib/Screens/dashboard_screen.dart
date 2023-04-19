@@ -5,6 +5,7 @@ import 'package:stonk_sim_client/Cubits/cubit/wishlist_cubit.dart';
 import 'package:stonk_sim_client/Models/stock_details_model.dart';
 import 'package:stonk_sim_client/Screens/search_screen.dart';
 import 'package:stonk_sim_client/Screens/stock_details_screen.dart';
+import 'package:stonk_sim_client/Utils/page_transition.dart';
 import 'package:stonk_sim_client/Utils/stockUtils.dart';
 import 'package:stonk_sim_client/colors.dart';
 import 'package:stonk_sim_client/network_vars.dart';
@@ -160,10 +161,7 @@ class wishListItem extends StatelessWidget {
 
   void showStockDetailsPage(BuildContext context, StockDetails details) {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => StockDetailsScreen(index: index),
-        ));
+        context, customSlideTransitionRight(StockDetailsScreen(index: index)));
   }
 
   @override
@@ -350,10 +348,7 @@ class SearchBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(80),
               onTap: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SearchScreen(),
-                    ));
+                    context, customSlideTransitionRight(const SearchScreen()));
               },
               child: Padding(
                 padding: const EdgeInsets.only(left: 18),

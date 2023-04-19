@@ -102,24 +102,21 @@ class searchResultElement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      trailing: GestureDetector(
-        onTap: () {
-          context.read<WishlistCubit>().addTicker(suggestions[index]['symbol']);
-          tickerNames[suggestions[index]['symbol']] =
-              suggestions[index]['name'];
-          try {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          } catch (e) {}
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: searchBarColor,
-              duration: Duration(seconds: 3),
-              content: Text(
-                  "${suggestions[index]['symbol']} has been added to your watch list")));
-        },
-        child: Icon(
-          Icons.bookmark,
-          color: textColorLightGrey,
-        ),
+      onTap: () {
+        context.read<WishlistCubit>().addTicker(suggestions[index]['symbol']);
+        tickerNames[suggestions[index]['symbol']] = suggestions[index]['name'];
+        try {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        } catch (e) {}
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: searchBarColor,
+            duration: Duration(seconds: 3),
+            content: Text(
+                "${suggestions[index]['symbol']} has been added to your watch list")));
+      },
+      trailing: Icon(
+        Icons.bookmark,
+        color: textColorLightGrey,
       ),
       title: Text(
         "${suggestions[index]['symbol'].toString()}, ${suggestions[index]['name'].toString()}",

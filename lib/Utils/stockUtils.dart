@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:stonk_sim_client/Models/stock_details_model.dart';
 import 'package:stonk_sim_client/network_vars.dart';
 
@@ -22,4 +24,15 @@ StockDetails getStockDetails(int index) {
       previousClosingPrice: previousClosingPrice,
       volume: volume,
       dailyRange: dailyRange);
+}
+
+List<dynamic> getGraphData(int index) {
+  String data = wishList.values.toList()[index][7].toString();
+  List<dynamic> parsedData = jsonDecode(data);
+
+  List<List<dynamic>> convertedData = [
+    parsedData[0].cast<int>(),
+    parsedData[1].cast<double>(),
+  ];
+  return convertedData;
 }

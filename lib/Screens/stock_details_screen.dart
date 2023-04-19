@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stonk_sim_client/Cubits/cubit/wishlist_cubit.dart';
 import 'package:stonk_sim_client/Models/stock_details_model.dart';
 import 'package:stonk_sim_client/Utils/stockUtils.dart';
+import 'package:stonk_sim_client/Widgets/stock_chart.dart';
 import 'package:stonk_sim_client/colors.dart';
 
 class StockDetailsScreen extends StatefulWidget {
@@ -42,9 +43,11 @@ class _StockDetailsScreenState extends State<StockDetailsScreen> {
                 builder: (context, state) {
                   details = getStockDetails(widget.index);
                   if (state is WishlistInitialState) {
-                    return StockDetailsList(details: details);
+                    return StockDetailsList(
+                        details: details, index: widget.index);
                   } else {
-                    return StockDetailsList(details: details);
+                    return StockDetailsList(
+                        details: details, index: widget.index);
                   }
                 },
               ))),
@@ -53,8 +56,10 @@ class _StockDetailsScreenState extends State<StockDetailsScreen> {
 }
 
 class StockDetailsList extends StatefulWidget {
-  const StockDetailsList({super.key, required this.details});
+  const StockDetailsList(
+      {super.key, required this.details, required this.index});
   final StockDetails details;
+  final int index;
 
   @override
   State<StockDetailsList> createState() => _StockDetailsListState();
@@ -67,6 +72,11 @@ class _StockDetailsListState extends State<StockDetailsList> {
       color: textColorLightGrey, fontSize: 42, fontWeight: FontWeight.w500);
   @override
   Widget build(BuildContext context) {
+    //
+    // final Map<dynamic, dynamic> graphData = getGraphData(widget.index);
+    // final List<int> timestamps = graphData[0];
+    // final List<double> prices = graphData[1];
+    //
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 21, vertical: 15),
       child: Column(
@@ -86,15 +96,18 @@ class _StockDetailsListState extends State<StockDetailsList> {
 
           // graph placeholder
           const SizedBox(height: 12),
-          Placeholder(
-            child: Container(
-                height: 180,
-                child: Center(
-                    child: Text(
-                        "Graph that may or may not exist/update \n(needs server to be a hybrid of REST and SocketIO)",
-                        textAlign: TextAlign.center,
-                        style: subTitleStyle))),
-          ),
+          StockChart(
+              prices: getGraphData(widget.index)[1],
+              timestamps: getGraphData(widget.index)[0]),
+          // Placeholder(
+          //   child: Container(
+          //       height: 180,
+          //       child: Center(
+          //           child: Text(
+          //               "Graph that may or may not exist/update \n(needs server to be a hybrid of REST and SocketIO)",
+          //               textAlign: TextAlign.center,
+          //               style: subTitleStyle))),
+          // ),
           Expanded(
             child: ListView(
               physics: const BouncingScrollPhysics(
@@ -119,7 +132,7 @@ class _StockDetailsListState extends State<StockDetailsList> {
                 Divider(color: textColorDarkGrey),
 
                 DetailsItem(details: [
-                  "Weekly Range",
+                  "Daily Range",
                   "\$ ${widget.details.dailyRange}"
                 ]),
 
@@ -149,7 +162,7 @@ class _PurchaseButtonsState extends State<PurchaseButtons> {
   Widget build(BuildContext context) {
     //
     const TextStyle style =
-        TextStyle(fontWeight: FontWeight.w300, fontSize: 18);
+        TextStyle(fontWeight: FontWeight.w400, fontSize: 18);
     //
     return Container(
       color: Colors.transparent,

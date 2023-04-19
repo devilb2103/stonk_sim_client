@@ -3,8 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stonk_sim_client/Cubits/SuggestionRefreshCubit/suggestion_refresh_cubit.dart';
 import 'package:stonk_sim_client/Cubits/cubit/wishlist_cubit.dart';
+import 'package:stonk_sim_client/Utils/stockUtils.dart';
 import 'package:stonk_sim_client/colors.dart';
 import 'package:stonk_sim_client/network_vars.dart';
+
+String searchText = "";
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -52,11 +55,11 @@ class _SearchScreenState extends State<SearchScreen> {
                             color: textColorDarkGrey,
                           ),
                         ),
-                        Expanded(child: SizedBox()),
+                        const Expanded(child: SizedBox()),
                         Container(
                             width: MediaQuery.of(context).size.width - 84,
-                            child: customSearchbar()),
-                        Expanded(child: SizedBox()),
+                            child: const CustomSearchbar()),
+                        const Expanded(child: SizedBox()),
                       ],
                     ),
                   ),
@@ -78,11 +81,19 @@ class _SearchScreenState extends State<SearchScreen> {
                   builder: (context, state) {
                     if (state is SuggestionRefreshInitialState) {
                       return ListView.builder(
-                        physics: BouncingScrollPhysics(),
-                        itemCount: suggestions.length,
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: searchText.isEmpty
+                            ? 0
+                            : suggestions.isEmpty
+                                ? 1
+                                : suggestions.length,
                         itemBuilder: (context, index) {
                           if (suggestions.isNotEmpty) {
-                            return searchResultElement(index: index);
+                            return searchResultElement(
+                                index: index, emptySuggestions: false);
+                          } else {
+                            return searchResultElement(
+                                index: index, emptySuggestions: true);
                           }
                         },
                       );
@@ -97,50 +108,75 @@ class _SearchScreenState extends State<SearchScreen> {
 }
 
 class searchResultElement extends StatelessWidget {
-  searchResultElement({super.key, required this.index});
+  searchResultElement(
+      {super.key, required this.index, required this.emptySuggestions});
   int index;
+  bool emptySuggestions;
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () {
-        context.read<WishlistCubit>().addTicker(suggestions[index]['symbol']);
-        tickerNames[suggestions[index]['symbol']] = suggestions[index]['name'];
-        try {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        } catch (e) {}
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: searchBarColor,
-            duration: Duration(seconds: 3),
-            content: Text(
-                "${suggestions[index]['symbol']} has been added to your watch list")));
-      },
-      trailing: Icon(
-        Icons.bookmark,
-        color: textColorLightGrey,
-      ),
-      title: Text(
-        "${suggestions[index]['symbol'].toString()}, ${suggestions[index]['name'].toString()}",
-        style: TextStyle(color: textColorLightGrey),
-      ),
-    );
+    if (!emptySuggestions) {
+      return ListTile(
+        onTap: () {
+          context.read<WishlistCubit>().addTicker(suggestions[index]['symbol']);
+          // tickerNames[suggestions[index]['symbol']] =
+          //     suggestions[index]['name'];
+          try {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          } catch (e) {}
+          showSnackbar(context,
+              "${suggestions[index]['symbol']} has been added to your watch list");
+        },
+        trailing: const Icon(
+          Icons.bookmark_rounded,
+          color: textColorLightGrey,
+        ),
+        title: Text(
+          "${suggestions[index]['symbol'].toString()}, ${suggestions[index]['name'].toString()}",
+          style: const TextStyle(color: textColorLightGrey),
+        ),
+      );
+    } else {
+      return ListTile(
+        onTap: () {
+          // try searching for text search string
+          context.read<WishlistCubit>().addTicker(searchText.toString().trim());
+          // set textsearch string as an ticker with no name
+          // tickerNames[searchText.toString().trim().toUpperCase()] = "";
+          try {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          } catch (e) {}
+          showSnackbar(
+              context, "Successfully added $searchText to your watch list");
+        },
+        trailing: const Icon(
+          Icons.search_off_rounded,
+          color: textColorLightGrey,
+        ),
+        title: Text(
+          "Try searching for the ticker '$searchText'",
+          style: const TextStyle(color: textColorLightGrey),
+        ),
+      );
+    }
   }
 }
 
-class customSearchbar extends StatelessWidget {
-  const customSearchbar({super.key});
+class CustomSearchbar extends StatelessWidget {
+  const CustomSearchbar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       cursorHeight: 24,
       onChanged: (value) async {
+        searchText = value.toString().trim();
         context
             .read<SuggestionRefreshCubit>()
             .refreshSuggestionUI(value.toString());
       },
-      style: TextStyle(color: textColorLightGrey),
+      style: const TextStyle(color: textColorLightGrey),
       cursorColor: Colors.grey,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         border: InputBorder.none,
       ),
     );

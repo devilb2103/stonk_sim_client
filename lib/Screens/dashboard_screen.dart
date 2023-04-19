@@ -28,13 +28,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void connect() {
     socket.connect();
     socket.onConnect((data) {
-      debugPrint("connected");
+      showSnackbar(context, "Connected to server");
       socket.on(
           "tickerStream",
           (data) => {
                 wishList = data,
+                registerStockTickers(data),
                 context.read<WishlistCubit>().updateWishlist(),
-                debugPrint(wishList.toString())
+                // debugPrint(wishList.toString())
               });
     });
     socket.onDisconnect((data) => {debugPrint("disconnected"), disconnect()});
@@ -42,7 +43,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void disconnect() {
     socket.disconnect();
-    Navigator.pop(context);
+    showSnackbar(context, "Disconnected from server");
+    // Navigator.pop(context);
   }
 
   @override
@@ -227,7 +229,7 @@ class wishListItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text("\$${details.currentPrice}", style: style1),
-                        Text(details.priceChangeP,
+                        Text("${details.priceChangeP}%",
                             style: TextStyle(
                                 color: (wishList.values
                                             .toList()[index][2]

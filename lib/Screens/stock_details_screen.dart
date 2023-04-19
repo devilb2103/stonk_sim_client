@@ -258,7 +258,7 @@ class ProfitPIndicator extends StatelessWidget {
     return SizedBox(
       height: 33,
       child: Card(
-        color: profitColor,
+        color: (double.parse(profitP) >= 0) ? profitColor : lossColor,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
@@ -272,7 +272,7 @@ class ProfitPIndicator extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    profitP,
+                    "${profitP}%",
                     style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ]),

@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:stonk_sim_client/Models/stock_details_model.dart';
+import 'package:stonk_sim_client/colors.dart';
 import 'package:stonk_sim_client/network_vars.dart';
 
 StockDetails getStockDetails(int index) {
@@ -9,7 +11,7 @@ StockDetails getStockDetails(int index) {
   final String ticker = wishList.keys.toList()[index].toString();
   final String currentPrice = "${wishList.values.toList()[index][0]}";
   final String priceChange = "${wishList.values.toList()[index][1]}";
-  final String priceChangeP = wishList.values.toList()[index][2] + "%";
+  final String priceChangeP = wishList.values.toList()[index][2];
   final String openingPrice = "${wishList.values.toList()[index][3]}";
   final String previousClosingPrice = "${wishList.values.toList()[index][4]}";
   final String volume = "${wishList.values.toList()[index][5]}";
@@ -35,4 +37,20 @@ List<dynamic> getGraphData(int index) {
     parsedData[1].cast<double>(),
   ];
   return convertedData;
+}
+
+void showSnackbar(BuildContext context, String data) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: searchBarColor,
+      duration: const Duration(milliseconds: 1500),
+      content: Text(data)));
+}
+
+void registerStockTickers(dynamic data) {
+  // add values to tickernames
+  data.forEach((key, value) {
+    if (!tickerNames.containsKey(key)) {
+      tickerNames[key] = value[8];
+    }
+  });
 }

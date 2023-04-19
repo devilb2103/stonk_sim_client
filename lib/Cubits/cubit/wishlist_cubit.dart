@@ -21,7 +21,7 @@ class WishlistCubit extends Cubit<WishlistState> {
 
   void addTicker(String ticker) {
     socket.emit("addTicker", {
-      "tickers": [ticker.toString()]
+      "tickers": [ticker.toString().toUpperCase()]
     });
   }
 }

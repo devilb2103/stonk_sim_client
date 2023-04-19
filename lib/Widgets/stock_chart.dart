@@ -51,7 +51,7 @@ class _StockChartState extends State<StockChart> {
             dataSource: _chartData,
             xValueMapper: (ChartData data, _) => data.time,
             yValueMapper: (ChartData data, _) => data.price,
-            color: Colors.blue,
+            color: Colors.lightBlueAccent,
           )
         ],
       ),

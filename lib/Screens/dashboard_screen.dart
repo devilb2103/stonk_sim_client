@@ -28,6 +28,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void connect() {
     socket.connect();
     socket.onConnect((data) {
+      Navigator.of(context).pop();
       showSnackbar(context, "Connected to server");
       socket.on(
           "tickerStream",
@@ -90,7 +91,7 @@ class AllShareListViewState extends State<AllShareListView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "My shares",
+              "Wishlisted shares",
               style: TextStyle(
                   color: textColorLightGrey,
                   fontSize: 24,

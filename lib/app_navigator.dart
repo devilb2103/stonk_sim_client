@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stonk_sim_client/Screens/dashboard_screen.dart';
+import 'package:stonk_sim_client/Screens/launch_screen.dart';
 
 class AppNavigator extends StatefulWidget {
   const AppNavigator({super.key});
@@ -14,6 +15,7 @@ class _AppNavigatorState extends State<AppNavigator> {
     return Navigator(
       pages: const [
         MaterialPage(child: DashboardScreen()),
+        MaterialPage(child: LaunchScreen()),
         // MaterialPage(child: DashboardScreen()),
       ],
       onPopPage: (route, result) {

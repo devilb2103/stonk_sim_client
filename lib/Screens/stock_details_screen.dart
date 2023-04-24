@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stonk_sim_client/Cubits/cubit/wishlist_cubit.dart';
 import 'package:stonk_sim_client/Models/stock_details_model.dart';
 import 'package:stonk_sim_client/Utils/stockUtils.dart';
+import 'package:stonk_sim_client/Widgets/custom_textfield.dart';
 import 'package:stonk_sim_client/Widgets/stock_chart.dart';
+import 'package:stonk_sim_client/accountVars.dart';
 import 'package:stonk_sim_client/colors.dart';
 
 class StockDetailsScreen extends StatefulWidget {
@@ -143,7 +146,8 @@ class _StockDetailsListState extends State<StockDetailsList> {
               ],
             ),
           ),
-          const PurchaseButtons()
+          PurchaseButtons(
+              currentPrice: double.parse(widget.details.currentPrice))
         ],
       ),
     );
@@ -151,7 +155,8 @@ class _StockDetailsListState extends State<StockDetailsList> {
 }
 
 class PurchaseButtons extends StatefulWidget {
-  const PurchaseButtons({super.key});
+  const PurchaseButtons({super.key, required this.currentPrice});
+  final double currentPrice;
 
   @override
   State<PurchaseButtons> createState() => _PurchaseButtonsState();
@@ -191,7 +196,9 @@ class _PurchaseButtonsState extends State<PurchaseButtons> {
             const SizedBox(width: 9),
             Expanded(
               child: GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    buyPopup(context, widget.currentPrice);
+                  },
                   child: Material(
                     color: backgroundColor,
                     borderRadius: BorderRadius.circular(30),
@@ -279,6 +286,87 @@ class ProfitPIndicator extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+void buyPopup(BuildContext context, double currentPrice) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return buyStockWidget(currentPrice: currentPrice);
+    },
+  );
+}
+
+class buyStockWidget extends StatefulWidget {
+  buyStockWidget({super.key, required this.currentPrice});
+
+  final double currentPrice;
+
+  @override
+  State<buyStockWidget> createState() => _buyStockWidgetState();
+  TextEditingController quantity = TextEditingController();
+}
+
+class _buyStockWidgetState extends State<buyStockWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      // alignment: Alignment.centerRight,
+      backgroundColor: backgroundColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(30),
+      ),
+      // title: Text(
+      //   "Buy Shares",
+      //   style: TextStyle(color: textColorLightGrey),
+      // ),
+      content: Container(
+        height: 180,
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Your balance: \$$balance",
+                style: const TextStyle(
+                    color: textColorLightGrey,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400),
+              ),
+              const SizedBox(height: 21),
+              CustomTextField(
+                controller: widget.quantity,
+                hintText: "Share Quantity",
+                maxLines: 1,
+                formatter:
+                    FilteringTextInputFormatter.allow(RegExp(r'^[0-9]+$')),
+                onChanged: (String text) {
+                  setState(() {});
+                },
+              ),
+              SizedBox(height: 12),
+              Text(
+                widget.quantity.text.isNotEmpty
+                    ? "Cost: \$${(double.parse(widget.quantity.text.toString()) * widget.currentPrice).toStringAsFixed(2)}"
+                    : "Cost: \$0",
+                style: const TextStyle(
+                    color: textColorLightGrey,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400),
+              ),
+            ]),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text("Confirm"),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+      actionsPadding: const EdgeInsets.only(bottom: 8, right: 18),
     );
   }
 }

@@ -6,10 +6,15 @@ import 'package:stonk_sim_client/Models/stock_details_model.dart';
 import 'package:stonk_sim_client/Screens/search_screen.dart';
 import 'package:stonk_sim_client/Screens/stock_details_screen.dart';
 import 'package:stonk_sim_client/Utils/page_transition.dart';
-import 'package:stonk_sim_client/Utils/stockUtils.dart';
+import 'package:stonk_sim_client/Utils/stock_data_utils.dart';
+import 'package:stonk_sim_client/Utils/transaction_utils.dart';
 import 'package:stonk_sim_client/colors.dart';
+import 'package:stonk_sim_client/local_storage.dart';
 import 'package:stonk_sim_client/network_vars.dart';
-import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+late SharedPreferences prefs;
+bool appstart = true;
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -25,9 +30,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     connect();
   }
 
-  void connect() {
+  void connect() async {
+    prefs = await SharedPreferences.getInstance();
     socket.connect();
     socket.onConnect((data) {
+      loadAppData(context);
       Navigator.of(context).pop();
       showSnackbar(context, "Connected to server");
       socket.on(
@@ -89,15 +96,15 @@ class AllShareListViewState extends State<AllShareListView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
+          children: const [
+            Text(
               "Wishlisted shares",
               style: TextStyle(
                   color: textColorLightGrey,
                   fontSize: 24,
                   fontWeight: FontWeight.w500),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15),
             Expanded(child: UserWishList())
           ],
         ),
@@ -170,7 +177,7 @@ class wishListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //
-    StockDetails details = getStockDetails(index);
+    StockDetails details = getStockDetailsByIndex(index);
     //
     return SizedBox(
       height: 90,
@@ -178,11 +185,14 @@ class wishListItem extends StatelessWidget {
         elevation: 1,
         color: searchBarColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(24),
         ),
         child: InkWell(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(24),
             highlightColor: searchBarColor,
+            onLongPress: () {
+              context.read<WishlistCubit>().remTicker(details.ticker);
+            },
             onTap: () {
               showStockDetailsPage(
                   context,
@@ -205,8 +215,7 @@ class wishListItem extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 7,
-                    child: Container(
-                        child: Column(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -220,12 +229,11 @@ class wishListItem extends StatelessWidget {
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12))
                       ],
-                    )),
+                    ),
                   ),
                   Expanded(
                     flex: 3,
-                    child: Container(
-                        child: Column(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
@@ -246,14 +254,13 @@ class wishListItem extends StatelessWidget {
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12))
                       ],
-                    )),
+                    ),
                   ),
                 ],
               ),
             )),
       ),
     );
-    ;
   }
 }
 
@@ -267,67 +274,82 @@ class AccountDetails extends StatefulWidget {
 class _AccountDetailsState extends State<AccountDetails> {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-        // height: 180,
-        width: double.maxFinite,
-        child: Card(
-          elevation: 2,
-          color: backgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(18),
-            highlightColor: searchBarColor,
-            onTap: () {},
-            child: Column(
-              children: [
-                const SizedBox(height: 12),
-                const Text(
-                  '\$12,345.03',
-                  style: TextStyle(
-                      color: textColorLightGrey,
-                      fontSize: 45,
-                      fontWeight: FontWeight.w500),
-                ),
-                SizedBox(
-                  height: 30,
-                  child: Card(
-                    color: profitColor,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
+    return BlocBuilder<WishlistCubit, WishlistState>(
+      builder: (context, state) {
+        //
+        List<double> portfolioDetails = calculatePortfolio();
+        double currAssetValue = portfolioDetails[0];
+        double profit = portfolioDetails[1];
+        double profitP = portfolioDetails[2];
+        //
+        return SizedBox(
+            // height: 180,
+            width: double.maxFinite,
+            child: Card(
+              elevation: 2,
+              color: backgroundColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(18),
+                highlightColor: searchBarColor,
+                onTap: () {},
+                child: Column(
+                  children: [
+                    const SizedBox(height: 12),
+                    Text(
+                      '\$ $currAssetValue',
+                      style: const TextStyle(
+                          color: textColorLightGrey,
+                          fontSize: 45,
+                          fontWeight: FontWeight.w500),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 9),
-                      child: IntrinsicHeight(
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Text(
-                                "+5.25%",
-                                style: TextStyle(fontWeight: FontWeight.w500),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 4.5),
-                                child: VerticalDivider(width: 12),
-                              ),
-                              Text(
-                                "+\$642.26",
-                                style: TextStyle(fontWeight: FontWeight.w500),
-                              )
-                            ]),
+                    SizedBox(
+                      height: 30,
+                      child: Card(
+                        color: profit >= 0 ? profitColor : lossColor,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 9),
+                          child: IntrinsicHeight(
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    profit >= 0
+                                        ? "+\$${profit.abs()}"
+                                        : "-\$${profit.abs()}",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 4.5),
+                                    child: VerticalDivider(width: 12),
+                                  ),
+                                  Text(
+                                    "%$profitP",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  )
+                                ]),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 18),
+                  ],
                 ),
-                const SizedBox(height: 18),
-              ],
-            ),
-          ),
-        ));
+              ),
+            ));
+      },
+    );
   }
 }
 

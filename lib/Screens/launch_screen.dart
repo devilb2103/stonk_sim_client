@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:stonk_sim_client/colors.dart';
 
 class LaunchScreen extends StatefulWidget {
@@ -28,6 +26,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    const Expanded(flex: 1, child: SizedBox()),
                     Container(
                       decoration: BoxDecoration(
                           color: textColorDarkGrey,
@@ -39,12 +38,30 @@ class _LaunchScreenState extends State<LaunchScreen> {
                             "StonkSim",
                             style: TextStyle(
                                 color: backgroundColor,
-                                fontWeight: FontWeight.w200,
+                                fontWeight: FontWeight.w300,
                                 fontSize: 33),
                           )),
                     ),
-                    SizedBox(height: 15),
-                    CircularProgressIndicator()
+                    const SizedBox(height: 12),
+                    Text(
+                      "Trade Simulation\nMade Easy",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: textColorDarkGrey,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 24),
+                    ),
+                    const Expanded(flex: 7, child: SizedBox()),
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 12),
+                    Text(
+                      "Connecting to server",
+                      style: TextStyle(
+                          color: textColorDarkGrey,
+                          fontWeight: FontWeight.w200,
+                          fontSize: 18),
+                    ),
+                    const Expanded(flex: 1, child: SizedBox()),
                   ],
                 ),
               ),

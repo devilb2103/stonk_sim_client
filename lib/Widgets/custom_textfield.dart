@@ -27,16 +27,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return TextFormField(
       onChanged: widget.onChanged,
       inputFormatters: [widget.formatter],
-      style: TextStyle(color: textColorLightGrey),
+      style: const TextStyle(color: textColorLightGrey),
       maxLines: widget.maxLines,
       controller: widget.controller,
       decoration: InputDecoration(
           hintStyle: TextStyle(color: textColorDarkGrey),
           enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black54),
+              borderSide: const BorderSide(color: Colors.black54),
               borderRadius: BorderRadius.circular(15)),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black54),
+            borderSide: const BorderSide(color: Colors.black54),
             borderRadius: BorderRadius.circular(15),
           ),
           border: const OutlineInputBorder(),

@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -6,7 +5,7 @@ class StockChart extends StatefulWidget {
   final List<double> prices;
   final List<int> timestamps;
 
-  StockChart({required this.prices, required this.timestamps});
+  const StockChart({super.key, required this.prices, required this.timestamps});
 
   @override
   _StockChartState createState() => _StockChartState();
@@ -34,10 +33,10 @@ class _StockChartState extends State<StockChart> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 255.0,
       child: SfCartesianChart(
-        margin: EdgeInsets.only(left: 0),
+        margin: const EdgeInsets.only(left: 0),
         zoomPanBehavior: ZoomPanBehavior(
           enablePinching: true,
           enableDoubleTapZooming: true,

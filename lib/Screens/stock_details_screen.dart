@@ -3,11 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stonk_sim_client/Cubits/cubit/wishlist_cubit.dart';
 import 'package:stonk_sim_client/Models/stock_details_model.dart';
-import 'package:stonk_sim_client/Utils/stockUtils.dart';
+import 'package:stonk_sim_client/Utils/stock_data_utils.dart';
+import 'package:stonk_sim_client/Utils/transaction_utils.dart';
 import 'package:stonk_sim_client/Widgets/custom_textfield.dart';
 import 'package:stonk_sim_client/Widgets/stock_chart.dart';
-import 'package:stonk_sim_client/accountVars.dart';
+import 'package:stonk_sim_client/account_vars.dart';
 import 'package:stonk_sim_client/colors.dart';
+
+late BuildContext _localContext;
 
 class StockDetailsScreen extends StatefulWidget {
   const StockDetailsScreen({super.key, required this.index});
@@ -20,8 +23,8 @@ class StockDetailsScreen extends StatefulWidget {
 class _StockDetailsScreenState extends State<StockDetailsScreen> {
   @override
   Widget build(BuildContext context) {
-    StockDetails details = getStockDetails(widget.index);
-
+    StockDetails details = getStockDetailsByIndex(widget.index);
+    _localContext = context;
     return SafeArea(
       child: Scaffold(
           backgroundColor: backgroundColor,
@@ -44,7 +47,6 @@ class _StockDetailsScreenState extends State<StockDetailsScreen> {
               height: double.maxFinite,
               child: BlocBuilder<WishlistCubit, WishlistState>(
                 builder: (context, state) {
-                  details = getStockDetails(widget.index);
                   if (state is WishlistInitialState) {
                     return StockDetailsList(
                         details: details, index: widget.index);
@@ -141,13 +143,15 @@ class _StockDetailsListState extends State<StockDetailsList> {
 
                 Divider(color: textColorDarkGrey),
 
-                DetailsItem(details: ["Volume", "${widget.details.volume}"]),
+                DetailsItem(details: ["Volume", (widget.details.volume)]),
                 Divider(color: textColorDarkGrey),
               ],
             ),
           ),
           PurchaseButtons(
-              currentPrice: double.parse(widget.details.currentPrice))
+            currentPrice: double.parse(widget.details.currentPrice),
+            ticker: widget.details.ticker,
+          )
         ],
       ),
     );
@@ -155,8 +159,10 @@ class _StockDetailsListState extends State<StockDetailsList> {
 }
 
 class PurchaseButtons extends StatefulWidget {
-  const PurchaseButtons({super.key, required this.currentPrice});
+  const PurchaseButtons(
+      {super.key, required this.currentPrice, required this.ticker});
   final double currentPrice;
+  final String ticker;
 
   @override
   State<PurchaseButtons> createState() => _PurchaseButtonsState();
@@ -178,40 +184,40 @@ class _PurchaseButtonsState extends State<PurchaseButtons> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
-              child: GestureDetector(
-                  onTap: () {},
-                  child: Material(
-                    color: backgroundColor,
-                    borderRadius: BorderRadius.circular(30),
-                    elevation: 3,
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: lossColor,
-                          borderRadius: BorderRadius.circular(30)),
-                      height: double.maxFinite,
-                      child: const Center(child: Text("Sell", style: style)),
-                    ),
-                  )),
-            ),
+                child: Material(
+              color: lossColor,
+              borderRadius: BorderRadius.circular(50),
+              child: InkWell(
+                onTap: () {
+                  sellPopup(context, widget.ticker);
+                },
+                borderRadius: BorderRadius.circular(50),
+                child: const SizedBox(
+                  height: double.maxFinite,
+                  child: Center(
+                    child: Text("Sell", style: style),
+                  ),
+                ),
+              ),
+            )),
             const SizedBox(width: 9),
             Expanded(
-              child: GestureDetector(
-                  onTap: () {
-                    buyPopup(context, widget.currentPrice);
-                  },
-                  child: Material(
-                    color: backgroundColor,
-                    borderRadius: BorderRadius.circular(30),
-                    elevation: 3,
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: profitColor,
-                          borderRadius: BorderRadius.circular(30)),
-                      height: double.maxFinite,
-                      child: const Center(child: Text("Buy", style: style)),
-                    ),
-                  )),
-            ),
+                child: Material(
+              color: profitColor,
+              borderRadius: BorderRadius.circular(50),
+              child: InkWell(
+                onTap: () {
+                  buyPopup(context, widget.currentPrice, widget.ticker);
+                },
+                borderRadius: BorderRadius.circular(50),
+                child: const SizedBox(
+                  height: double.maxFinite,
+                  child: Center(
+                    child: Text("Buy", style: style),
+                  ),
+                ),
+              ),
+            ))
           ]),
     );
   }
@@ -279,7 +285,7 @@ class ProfitPIndicator extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "${profitP}%",
+                    "$profitP%",
                     style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ]),
@@ -290,19 +296,34 @@ class ProfitPIndicator extends StatelessWidget {
   }
 }
 
-void buyPopup(BuildContext context, double currentPrice) {
+void buyPopup(BuildContext context, double currentPrice, String ticker) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      return buyStockWidget(currentPrice: currentPrice);
+      return buyStockWidget(
+        currentPrice: currentPrice,
+        ticker: ticker,
+      );
+    },
+  );
+}
+
+void sellPopup(BuildContext context, String ticker) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return sellStockWidget(
+        ticker: ticker,
+      );
     },
   );
 }
 
 class buyStockWidget extends StatefulWidget {
-  buyStockWidget({super.key, required this.currentPrice});
+  buyStockWidget({super.key, required this.currentPrice, required this.ticker});
 
   final double currentPrice;
+  final String ticker;
 
   @override
   State<buyStockWidget> createState() => _buyStockWidgetState();
@@ -322,14 +343,14 @@ class _buyStockWidgetState extends State<buyStockWidget> {
       //   "Buy Shares",
       //   style: TextStyle(color: textColorLightGrey),
       // ),
-      content: Container(
+      content: SizedBox(
         height: 180,
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Your balance: \$$balance",
+                "Your balance: \$ $balance",
                 style: const TextStyle(
                     color: textColorLightGrey,
                     fontSize: 15,
@@ -346,11 +367,11 @@ class _buyStockWidgetState extends State<buyStockWidget> {
                   setState(() {});
                 },
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Text(
                 widget.quantity.text.isNotEmpty
-                    ? "Cost: \$${(double.parse(widget.quantity.text.toString()) * widget.currentPrice).toStringAsFixed(2)}"
-                    : "Cost: \$0",
+                    ? "Cost: \$ ${(double.parse(widget.quantity.text.toString()) * widget.currentPrice).toStringAsFixed(2)}"
+                    : "Cost: \$ 0",
                 style: const TextStyle(
                     color: textColorLightGrey,
                     fontSize: 15,
@@ -360,13 +381,129 @@ class _buyStockWidgetState extends State<buyStockWidget> {
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text("Confirm"),
+          child: const Text("Buy"),
           onPressed: () {
-            Navigator.of(context).pop();
+            dynamic transactionStatus = buyShares(
+                widget.ticker,
+                widget.currentPrice,
+                double.parse(widget.quantity.text.toString()));
+            if (transactionStatus == true) {
+              print(purchases);
+              // context.read<WishlistCubit>().updateWishlist();
+              _localContext.read<WishlistCubit>().updateWishlist();
+              Navigator.of(context).pop();
+            } else {
+              showSnackbar(context, transactionStatus);
+            }
           },
         ),
       ],
       actionsPadding: const EdgeInsets.only(bottom: 8, right: 18),
+    );
+  }
+}
+
+class sellStockWidget extends StatefulWidget {
+  const sellStockWidget({super.key, required this.ticker});
+
+  final String ticker;
+
+  @override
+  State<sellStockWidget> createState() => _sellStockWidgetState();
+}
+
+class _sellStockWidgetState extends State<sellStockWidget> {
+  @override
+  Widget build(BuildContext context) {
+    //
+    dynamic data = getTickerPurchases(widget.ticker);
+    //
+    return AlertDialog(
+      // alignment: Alignment.centerRight,
+      backgroundColor: backgroundColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(30),
+      ),
+      content: SizedBox(
+        height: 450,
+        width: MediaQuery.of(context).size.width - 30,
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Purchased Shares",
+                style: TextStyle(
+                    color: textColorLightGrey,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400),
+              ),
+              const SizedBox(height: 12),
+              data == null
+                  ? const Expanded(flex: 1, child: SizedBox())
+                  : Container(),
+              data != null
+                  ? Expanded(
+                      child: ListView.builder(
+                        physics: const BouncingScrollPhysics(
+                            parent: AlwaysScrollableScrollPhysics()),
+                        itemCount: data.length,
+                        itemBuilder: (context, index) {
+                          return item(data, index);
+                        },
+                      ),
+                    )
+                  : Text(
+                      "You haven't purchased any shares of this company yet.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: textColorDarkGrey),
+                    ),
+              data == null
+                  ? const Expanded(flex: 1, child: SizedBox())
+                  : Container(),
+            ]),
+      ),
+    );
+  }
+
+  Widget item(Map data, int index) {
+    String price = data.keys.toList()[index];
+    double quantity = data.values.toList()[index];
+    return SizedBox(
+      height: 45,
+      child: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              "\$$price x ${quantity.toStringAsFixed(0)} Shares",
+              style: TextStyle(
+                  color: textColorDarkGrey, overflow: TextOverflow.ellipsis),
+            ),
+            Material(
+              color: lossColor,
+              borderRadius: BorderRadius.circular(18),
+              child: InkWell(
+                onTap: () {
+                  sellShare(widget.ticker, price.toString());
+                  setState(() {});
+                },
+                borderRadius: BorderRadius.circular(18),
+                child: const SizedBox(
+                  width: 66,
+                  height: 30,
+                  child: Center(
+                    child: Text("Sell",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400, fontSize: 15)),
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

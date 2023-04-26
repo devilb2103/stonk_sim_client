@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stonk_sim_client/Cubits/SuggestionRefreshCubit/suggestion_refresh_cubit.dart';
 import 'package:stonk_sim_client/Cubits/cubit/wishlist_cubit.dart';
-import 'package:stonk_sim_client/Utils/stockUtils.dart';
+import 'package:stonk_sim_client/Utils/stock_data_utils.dart';
 import 'package:stonk_sim_client/colors.dart';
 import 'package:stonk_sim_client/network_vars.dart';
 
@@ -56,7 +55,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                         ),
                         const Expanded(child: SizedBox()),
-                        Container(
+                        SizedBox(
                             width: MediaQuery.of(context).size.width - 84,
                             child: const CustomSearchbar()),
                         const Expanded(child: SizedBox()),
@@ -72,9 +71,8 @@ class _SearchScreenState extends State<SearchScreen> {
             child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 21, vertical: 15),
-                child: Container(
-                    child: BlocConsumer<SuggestionRefreshCubit,
-                        SuggestionRefreshState>(
+                child: BlocConsumer<SuggestionRefreshCubit,
+                    SuggestionRefreshState>(
                   listener: (context, state) {
                     if (state is SuggestionRefreshInitialState) {}
                   },
@@ -101,7 +99,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       return const Center(child: CircularProgressIndicator());
                     }
                   },
-                ))),
+                )),
           )),
     );
   }

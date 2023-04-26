@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:stonk_sim_client/Models/stock_details_model.dart';
+import 'package:stonk_sim_client/Screens/dashboard_screen.dart';
 import 'package:stonk_sim_client/colors.dart';
 import 'package:stonk_sim_client/network_vars.dart';
 
-StockDetails getStockDetails(int index) {
+StockDetails getStockDetailsByIndex(int index) {
   final String companyName =
       tickerNames[wishList.keys.toList()[index].toString()].toString();
   final String ticker = wishList.keys.toList()[index].toString();
@@ -16,6 +17,29 @@ StockDetails getStockDetails(int index) {
   final String previousClosingPrice = "${wishList.values.toList()[index][4]}";
   final String volume = "${wishList.values.toList()[index][5]}";
   final String dailyRange = "${wishList.values.toList()[index][6]}";
+  return StockDetails(
+      companyName: companyName,
+      ticker: ticker,
+      currentPrice: currentPrice,
+      priceChange: priceChange,
+      priceChangeP: priceChangeP,
+      openingPrice: openingPrice,
+      previousClosingPrice: previousClosingPrice,
+      volume: volume,
+      dailyRange: dailyRange);
+}
+
+StockDetails getStockDetailsByTicker(String tickerName) {
+  final String companyName = tickerNames[tickerName].toString();
+  final String ticker = tickerName;
+  print([wishList, tickerName]);
+  final String currentPrice = "${wishList[tickerName][0]}";
+  final String priceChange = "${wishList[tickerName][1]}";
+  final String priceChangeP = wishList[tickerName][2];
+  final String openingPrice = "${wishList[tickerName][3]}";
+  final String previousClosingPrice = "${wishList[tickerName][4]}";
+  final String volume = "${wishList[tickerName][5]}";
+  final String dailyRange = "${wishList[tickerName][6]}";
   return StockDetails(
       companyName: companyName,
       ticker: ticker,
@@ -53,4 +77,5 @@ void registerStockTickers(dynamic data) {
       tickerNames[key] = value[8];
     }
   });
+  prefs.setString('tickers', json.encode(tickerNames));
 }

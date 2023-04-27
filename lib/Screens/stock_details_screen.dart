@@ -350,7 +350,7 @@ class _buyStockWidgetState extends State<buyStockWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Your balance: \$ $balance",
+                "Your balance: \$ ${double.parse(balance.toStringAsFixed(2))}",
                 style: const TextStyle(
                     color: textColorLightGrey,
                     fontSize: 15,
@@ -486,7 +486,8 @@ class _sellStockWidgetState extends State<sellStockWidget> {
               borderRadius: BorderRadius.circular(18),
               child: InkWell(
                 onTap: () {
-                  sellShare(widget.ticker, price.toString());
+                  sellShare(widget.ticker, price.toString(),
+                      getStockDetailsByTicker(widget.ticker).currentPrice);
                   setState(() {});
                 },
                 borderRadius: BorderRadius.circular(18),

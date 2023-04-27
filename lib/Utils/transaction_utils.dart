@@ -87,7 +87,7 @@ dynamic getTickerPurchases(String ticker) {
   }
 }
 
-void sellShare(String ticker, String price) {
-  balance += double.parse(price) * purchases[ticker]![price]!;
-  purchases[ticker]!.remove(price);
+void sellShare(String ticker, String BuyPrice, SellPrice) {
+  balance += (double.parse(SellPrice) * purchases[ticker]![BuyPrice]!);
+  purchases[ticker]!.remove(BuyPrice);
 }

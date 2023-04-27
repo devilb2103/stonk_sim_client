@@ -32,7 +32,6 @@ StockDetails getStockDetailsByIndex(int index) {
 StockDetails getStockDetailsByTicker(String tickerName) {
   final String companyName = tickerNames[tickerName].toString();
   final String ticker = tickerName;
-  print([wishList, tickerName]);
   final String currentPrice = "${wishList[tickerName][0]}";
   final String priceChange = "${wishList[tickerName][1]}";
   final String priceChangeP = wishList[tickerName][2];

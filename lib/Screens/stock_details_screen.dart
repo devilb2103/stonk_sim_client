@@ -388,8 +388,6 @@ class _buyStockWidgetState extends State<buyStockWidget> {
                 widget.currentPrice,
                 double.parse(widget.quantity.text.toString()));
             if (transactionStatus == true) {
-              print(purchases);
-              // context.read<WishlistCubit>().updateWishlist();
               _localContext.read<WishlistCubit>().updateWishlist();
               Navigator.of(context).pop();
             } else {

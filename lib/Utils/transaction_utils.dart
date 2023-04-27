@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:stonk_sim_client/Screens/dashboard_screen.dart';
 import 'package:stonk_sim_client/Utils/stock_data_utils.dart';
 import 'package:stonk_sim_client/account_vars.dart';
+import 'package:stonk_sim_client/local_storage.dart';
 import 'package:stonk_sim_client/network_vars.dart';
 
 dynamic buyShares(String ticker, double price, double quantity) {
@@ -49,7 +50,7 @@ List<double> calculatePortfolio() {
   });
 
   // if prices of purchased stocks are loaded
-  if (wishList != {}) {
+  if (wishList.isNotEmpty) {
     bal = balance; // unused credit balance
 
     // add prices of bought shares to unused credit balance
@@ -87,7 +88,8 @@ dynamic getTickerPurchases(String ticker) {
   }
 }
 
-void sellShare(String ticker, String BuyPrice, SellPrice) {
+void sellShare(String ticker, String BuyPrice, String SellPrice) {
   balance += (double.parse(SellPrice) * purchases[ticker]![BuyPrice]!);
   purchases[ticker]!.remove(BuyPrice);
+  saveAppData();
 }
